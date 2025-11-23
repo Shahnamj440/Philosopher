@@ -8,7 +8,7 @@ public class Philosopher extends Thread implements IPhilosopher {
 	@Override
 	public void setLeft(IPhilosopher left) {
 		// TODO Auto-generated method stub
-		// Cast auf Philosopher erforderlich
+		// Cast auf Philosopher erforderlich Test1
 	}
 
 	@Override
