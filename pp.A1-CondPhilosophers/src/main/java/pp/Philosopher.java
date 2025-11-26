@@ -1,6 +1,7 @@
 package pp;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 
 public class Philosopher extends Thread implements IPhilosopher {
@@ -9,6 +10,7 @@ public class Philosopher extends Thread implements IPhilosopher {
 	private Philosopher right;
 	private Lock table;
 	private volatile boolean running = true;
+	private final AtomicInteger eaten = new AtomicInteger();
 	private final java.util.Random rand = new java.util.Random();
 
 	@Override
@@ -48,8 +50,8 @@ public class Philosopher extends Thread implements IPhilosopher {
 		while(running){
 			try {
 				int think = rand.nextInt(PhilosopherExperiment.MAX_THINKING_DURATION_MS + 1);
-			log (seat, "thinking for " + think + "ms");
-			Thread.sleep(think);
+				log (seat, eaten, "thinking for " + think + "ms.");
+				Thread.sleep(think);
 
 			} catch (InterruptedException e) {
 				if (!running) break;
@@ -61,22 +63,27 @@ public class Philosopher extends Thread implements IPhilosopher {
 
 				if (acquired) {
 					int eat = rand.nextInt(PhilosopherExperiment.MAX_EATING_DURATION_MS + 1);
-					log(seat, "eating for " + eat + "ms");
+					log(seat, eaten, "eating for " + eat + "ms.");
 
 					try {
 						Thread.sleep(eat);
+						eaten.incrementAndGet();
 					} catch (InterruptedException ex) {
-						
+						if (!running) break;
 					}
+				} else {
+					log(seat, eaten, "couldn't get the table lock.");
 				}
 			
 			} catch (InterruptedException e) {
-				
+				if (!running) break;
 			} finally {
-				if (acquired && !running) {
+				if (acquired) {
 					table.unlock();
+					log(seat, eaten, "released table.");
 				}
 			}
 		}
+		log(seat, eaten, "stopped.");
 	}
 }
