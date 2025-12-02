@@ -1,17 +1,36 @@
 package pp;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
 public class Philosopher extends Thread implements IPhilosopher {
-	private int seat;
 	private Philosopher left;
 	private Philosopher right;
 	private Lock table;
-	private volatile boolean running = true;
-	private final AtomicInteger eaten = new AtomicInteger();
-	private final java.util.Random rand = new java.util.Random();
+	private int seat;
+	private int eaten;
+	private boolean eating;
+	private volatile boolean stop;
+	private final Random random;
+	private Condition condition;
+
+	private void log(String message){
+		synchronized (Philosopher.class) {
+			for (int i = 0; i < this.seat; i++){
+				System.out.println("                         ");
+			}
+			System.out.println("P" + this.seat + ":" + message);
+		}
+	}
+
+	public Philosopher() {
+		this.eaten = 0;
+		this.eating = false;
+		this.stop = false;
+		this.random = new Random();
+	}
 
 	@Override
 	public void setLeft(IPhilosopher left) {
@@ -36,54 +55,19 @@ public class Philosopher extends Thread implements IPhilosopher {
 	public void setTable(Lock table) {
 		// TODO Auto-generated method stub
 		this.table = table;
+		this.condition = this.table.newCondition();
 	}
-
+	
 	@Override
 	public void stopPhilosopher() {
 		// TODO Auto-generated method stub
-		running = false;
+		log("stopping.");
+		stop = true;
 		this.interrupt();
 	}
 
 	@Override
 	public void run(){
-		while(running){
-			try {
-				int think = rand.nextInt(PhilosopherExperiment.MAX_THINKING_DURATION_MS + 1);
-				log (seat, eaten, "thinking for " + think + "ms.");
-				Thread.sleep(think);
-
-			} catch (InterruptedException e) {
-				if (!running) break;
-			}
-			
-			boolean acquired = false;
-			try {
-				acquired = table.tryLock(PhilosopherExperiment.MAX_TAKING_TIME_MS, TimeUnit.MILLISECONDS);
-
-				if (acquired) {
-					int eat = rand.nextInt(PhilosopherExperiment.MAX_EATING_DURATION_MS + 1);
-					log(seat, eaten, "eating for " + eat + "ms.");
-
-					try {
-						Thread.sleep(eat);
-						eaten.incrementAndGet();
-					} catch (InterruptedException ex) {
-						if (!running) break;
-					}
-				} else {
-					log(seat, eaten, "couldn't get the table lock.");
-				}
-			
-			} catch (InterruptedException e) {
-				if (!running) break;
-			} finally {
-				if (acquired) {
-					table.unlock();
-					log(seat, eaten, "released table.");
-				}
-			}
-		}
-		log(seat, eaten, "stopped.");
+		
 	}
 }
