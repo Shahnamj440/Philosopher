@@ -68,6 +68,31 @@ public class Philosopher extends Thread implements IPhilosopher {
 
 	@Override
 	public void run(){
+		log("starting");
+		try {
+			while(!this.stop){
+				think();
+				eat();
+			}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+	}
+
+	private void think() throws InterruptedException {
+		this.table.lock();
+		try {
+			if (this.eating) {
+				log("left and right released.");
+				this.eating = false;
+			}
+		} finally {
+			this.table.unlock();
+		}
+		Thread.sleep(this.random.nextInt(PhilosopherExperiment.MAX_EATING_DURATION_MS));
+	}
+
+	private void eat() throws InterruptedException {
 		
 	}
 }
