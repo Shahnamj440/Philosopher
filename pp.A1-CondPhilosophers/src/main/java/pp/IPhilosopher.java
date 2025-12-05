@@ -1,6 +1,5 @@
 package pp;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 
 public interface IPhilosopher {
@@ -18,13 +17,13 @@ public interface IPhilosopher {
 	void start();
 
 	void stopPhilosopher();
-
-	default void log(int seat, AtomicInteger eaten, String message) {
+	
+	default void log(int seat, int eaten, String message) {
 		synchronized (Philosopher.class) {
 			for (var i = 1; i <= seat; i++) {
 				System.out.print("                         ");
 			}
-			System.out.println("P" + seat + " - Eaten: " + eaten.get() + " : " + message);
+			System.out.println("P" + seat + " - Eaten: " + eaten + " : " + message);
 		}
 	}
 }

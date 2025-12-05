@@ -1,9 +1,9 @@
 package pp;
 
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Philosopher extends Thread implements IPhilosopher {
 	private Philosopher left;
@@ -56,6 +56,7 @@ public class Philosopher extends Thread implements IPhilosopher {
 		// TODO Auto-generated method stub
 		this.table = table;
 		this.condition = this.table.newCondition();
+		this.condition = ((ReentrantLock) this.table).newCondition();
 	}
 	
 	@Override
@@ -89,10 +90,26 @@ public class Philosopher extends Thread implements IPhilosopher {
 		} finally {
 			this.table.unlock();
 		}
-		Thread.sleep(this.random.nextInt(PhilosopherExperiment.MAX_EATING_DURATION_MS));
+		Thread.sleep(this.random.nextInt(PhilosopherExperiment.MAX_THINKING_DURATION_MS));
 	}
 
 	private void eat() throws InterruptedException {
-		
+		this.table.lock();
+		try {
+			while (this.right.eating || this.left.eating) { 
+				log("try taking left or right.");
+				this.condition.await();
+			}
+			Thread.sleep(this.random.nextInt(PhilosopherExperiment.MAX_TAKING_TIME_MS));
+			log("left and right acquired.");
+			log("eating.");
+			this.eating = true;
+			this.eaten++;
+			this.condition.signalAll();
+		} finally {
+			this.table.unlock();
+		}
+		Thread.sleep(this.random.nextInt(PhilosopherExperiment.MAX_EATING_DURATION_MS));
+		log("finished eating.");
 	}
 }
