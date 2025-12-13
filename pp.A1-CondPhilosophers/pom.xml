@@ -17,12 +17,6 @@
       <version>5.10.0</version>
       <scope>test</scope>
     </dependency>
-    <dependency><!-- für Lombok -->
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>1.18.30</version>
-      <scope>provided</scope>
-    </dependency>
     <dependency><!-- für net.jcip Annotationen -->
       <groupId>net.jcip</groupId>
       <artifactId>jcip-annotations</artifactId>

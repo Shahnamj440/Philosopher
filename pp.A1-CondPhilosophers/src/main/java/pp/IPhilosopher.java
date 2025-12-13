@@ -17,14 +17,13 @@ public interface IPhilosopher {
 	void start();
 
 	void stopPhilosopher();
-
-	default void log(int seat, String message) {
+	
+	default void log(int seat, int eaten, String message) {
 		synchronized (Philosopher.class) {
 			for (var i = 1; i <= seat; i++) {
 				System.out.print("                         ");
 			}
-			System.out.println("P" + seat + ": " + message);
+			System.out.println("P" + seat + " - Eaten: " + eaten + " : " + message);
 		}
 	}
-
 }

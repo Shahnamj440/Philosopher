@@ -23,8 +23,7 @@ public class PhilosopherExperiment {
       philosophers[i].setLeft(philosophers[i - 1]);
       philosophers[i].setRight(philosophers[i + 1]);
     }
-    philosophers[PHILOSOPHER_NUM - 1]
-        .setLeft(philosophers[PHILOSOPHER_NUM - 2]);
+    philosophers[PHILOSOPHER_NUM - 1].setLeft(philosophers[PHILOSOPHER_NUM - 2]);
     philosophers[PHILOSOPHER_NUM - 1].setRight(philosophers[0]);
     for (var i = 0; i < PHILOSOPHER_NUM; i++) {
       philosophers[i].start();
